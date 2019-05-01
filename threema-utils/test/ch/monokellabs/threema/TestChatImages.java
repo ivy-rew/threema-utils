@@ -30,16 +30,16 @@ public class TestChatImages {
 	}
 	
 	@Test
-	public void readImageDates() throws IOException
+	public void writeImageMetaData() throws IOException
 	{
 		File messagesTxt = loadChatUsingZip();
 		File chatUnderTest = messagesTxt.getParentFile();
 		List<Message> mediaMsgs = ChatExport.getMediaMessages(messagesTxt);
-		mediaMsgs.forEach(message -> {
-			MediaFile media = new MediaFile(chatUnderTest, message);
-			media.setSentTimestamp();
-		});
+		ChatExport.updateMedia(chatUnderTest, mediaMsgs);
+		
 		System.out.println(chatUnderTest);
+		File rewritten = new File(chatUnderTest, "out/2019-03-14_18-16_Sandra.jpg");
+		Assertions.assertThat(rewritten).isFile().exists();
 	}
 	
 	@Test

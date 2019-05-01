@@ -1,6 +1,7 @@
 package ch.monokellabs.threema;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -14,6 +15,52 @@ public class ChatExport {
 
 	private static Pattern MESSAGE = Pattern.compile("\\[[0-9]*/[0-9]*/[0-9]*, [0-9]*:[0-9]*\\].*");
 
+	public static void main(String[] args)
+	{
+		File chatDir = new File(System.getProperty("user.dir"));
+		System.out.println("updating chat in "+chatDir);
+		
+		File conversation = getConversationOf(chatDir);
+		System.out.println("read messages in "+conversation);
+		
+		try {
+			List<Message> mediaMsg = getMediaMessages(conversation);
+			System.out.println("Found "+mediaMsg.size()+" media files to enrich.");
+			updateMedia(conversation.getParentFile(), mediaMsg);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("done: visit '"+chatDir+"/out' to examine results");
+	}
+
+	private static File getConversationOf(File chatDir) {
+		File[] foundFiles = chatDir.listFiles(new FilenameFilter() {
+		    public boolean accept(File dir, String name) {
+		        return name.startsWith("messages-");
+		    }
+		});
+		if (foundFiles.length == 0)
+		{
+			throw new IllegalArgumentException("no messages file found (e.g. messages-MyChat.txt");
+		}
+		File conversation = foundFiles[0];
+		return conversation;
+	}
+	
+	public static void updateMedia(File chatDir, List<Message> messages)
+	{
+		messages.forEach(message -> {
+			MediaFile media = new MediaFile(chatDir, message);
+			if (!media.exists())
+			{
+				System.out.println("Skipping not existing media "+media);
+				return;
+			}
+			media.setMetaData();
+			media.setSentTimestamp();
+		});
+	}
+	
 	public static List<Message> getMediaMessages(File messagesTxt) throws IOException
 	{
 		List<String> messages = readMessagesAsString(messagesTxt);
