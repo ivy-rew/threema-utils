@@ -44,6 +44,8 @@ public class MediaFile {
 				.append(df.format(msg.date))
 				.append("_")
 				.append(msg.sender)
+				.append("_")
+				.append(StringUtils.substringBefore(msg.media, "-")) // unique if multiple in same min
 				.append('.')
 				.append(ext)
 				.toString();
@@ -70,7 +72,6 @@ public class MediaFile {
 		{
 			if (copy.getName().endsWith(".jpg"))
 			{
-				
 				TiffOutputSet set = new TiffOutputSet();
 				TiffOutputDirectory exifDirectory = set.getOrCreateExifDirectory();
 				exifDirectory.add(MicrosoftTagConstants.EXIF_TAG_XPAUTHOR, msg.sender);

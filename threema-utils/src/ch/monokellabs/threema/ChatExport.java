@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class ChatExport {
 
-	private static Pattern MESSAGE = Pattern.compile("\\[[0-9]*/[0-9]*/[0-9]*, [0-9]*:[0-9]*\\].*");
+	private static Pattern MESSAGE = Pattern.compile("\\[[0-9]*/[0-9]*/[0-9]*, [0-9]*:[0-9]*\\][^\\[]*", Pattern.DOTALL);
 
 	public static void main(String[] args)
 	{
@@ -49,16 +49,20 @@ public class ChatExport {
 	
 	public static void updateMedia(File chatDir, List<Message> messages)
 	{
+		int[] update = {0};
 		messages.forEach(message -> {
 			MediaFile media = new MediaFile(chatDir, message);
+			System.out.println("update "+media);
 			if (!media.exists())
 			{
-				System.out.println("Skipping not existing media "+media);
+				System.err.println("Skipping not existing media "+media);
 				return;
 			}
+			update[0] = update[0]+1;
 			media.setMetaData();
 			media.setSentTimestamp();
 		});
+		System.out.println("updated "+update[0]+ "media files");
 	}
 	
 	public static List<Message> getMediaMessages(File messagesTxt) throws IOException
@@ -78,15 +82,14 @@ public class ChatExport {
 		try(InputStream is = Files.newInputStream(messagesTxt.toPath());
 			Scanner scanner = new Scanner(is))
 		{
-			;
 			while(scanner.hasNext())
 			{
-				String match = scanner.findInLine(MESSAGE);
+				String match = scanner.findWithinHorizon(MESSAGE, 2000);
 				if (match != null)
 				{
 					messages.add(match);
 				}
-				scanner.nextLine();
+				scanner.hasNext();
 			}
 		}
 		return messages;
