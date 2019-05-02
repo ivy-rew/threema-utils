@@ -13,7 +13,7 @@ The images do not have any reasonable meta data that allow mental mappings:
 The chat exporter analyses the conversation files of the exported chat to re-construct this important data. The output will be a copy of the media files with re-constructed sent date and the author occuring in the name. E.g. `2018-07-24_20-26_Henry_c1fe05f3.jpg`
 
 ### How to run
-1. Download the Threema-Utlis binary JAR. And install a Java Runtime Environment.
+1. Download the Threema-Utlis binary JAR from the [release site](https://github.com/ivy-rew/threema-utils/releases). And install a Java Runtime Environment.
 2. Create a Chat.zip using Threemas official export functionality: https://threema.ch/es/faq/chatexport
 3. Transfer the ZIP to your computer and unpack it.
 4. Run the image within the directory containing the extracted chat.
